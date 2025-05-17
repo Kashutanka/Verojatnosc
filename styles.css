@@ -18,9 +18,21 @@ body {
   margin: 0;
   padding: 0 20px 40px;
   line-height: 1.6;
+  user-select: none;
+  -webkit-user-select: none;
+  /* Safari */
+  -ms-user-select: none;
+  /* IE/Edge */
 }
 
-h1, h2, h3 {
+body::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Edge, Safari */
+}
+
+h1,
+h2,
+h3 {
   color: var(--accent3);
   margin-top: 1.2em;
 }
@@ -48,7 +60,8 @@ a {
   transition: color 0.3s ease;
 }
 
-a:hover, a:focus {
+a:hover,
+a:focus {
   color: var(--accent2);
   text-decoration: underline;
 }
@@ -84,7 +97,8 @@ button {
   transition: background-color 0.3s ease;
 }
 
-button:hover, button:focus {
+button:hover,
+button:focus {
   background-color: var(--accent2);
   color: var(--text-light);
   outline: none;
@@ -112,7 +126,7 @@ section {
   border-radius: 8px;
   padding: 1.5em 1.8em 2em;
   margin-bottom: 2.2em;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.7);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
 }
 
 p {
@@ -127,7 +141,8 @@ table {
   margin-top: 1em;
 }
 
-th, td {
+th,
+td {
   border: 1px solid var(--accent3);
   padding: 8px;
   text-align: left;
@@ -160,9 +175,11 @@ footer {
     flex-direction: column;
     gap: 12px;
   }
+
   input[type="number"] {
     width: 60px;
   }
+
   button {
     width: 100%;
     margin: 0.3em 0 1em;

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Примеры и задачи — Теория вероятностей</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <header>
+        <h1>Теория вероятностей</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="concepts.html">Основные понятия</a></li>
+                <li><a href="types.html">Виды вероятности</a></li>
+                <li><a href="formulas.html">Законы и формулы</a></li>
+                <li><a href="examples.html" aria-current="page">Примеры и задачи</a></li>
+                <li><a href="visuals.html">Визуализации</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h2>Примеры и задачи</h2>
+
+        <!-- Монета -->
+        <section>
+            <h3>Пример 1: Монета (интерактивно)</h3>
+            <p>Вероятность выпадения орла или решки — равны. Можно подкорректировать вероятности и посмотреть результат.
+            </p>
+            <label>Вероятность Орла (0..1): <input type="number" id="coinHeadProb" min="0" max="1" step="0.01"
+                    value="0.5" /></label>
+            <label>Вероятность Решки (0..1): <input type="number" id="coinTailProb" min="0" max="1" step="0.01"
+                    value="0.5" /></label>
+            <canvas id="coinChart" width="400" height="200"></canvas>
+        </section>
+
+        <!-- Кубик -->
+        <section>
+            <h3>Пример 2: Игральный кубик (интерактивно)</h3>
+            <p>Введите вероятности для каждой из граней кубика (сумма должна быть 1).</p>
+            <div id="diceInputs"></div>
+            <canvas id="diceChart" width="400" height="200"></canvas>
+        </section>
+
+        <!-- Карты -->
+        <section>
+            <h3>Пример 3: Карты (интерактивно)</h3>
+            <p>Измените количество тузов и общее число карт.</p>
+            <label>Тузов: <input type="number" id="aceCount" value="4" min="0" /></label>
+            <label>Всего карт: <input type="number" id="deckCount" value="52" min="1" /></label>
+            <canvas id="cardsChart" width="400" height="200"></canvas>
+        </section>
+
+        <!-- Урна -->
+        <section>
+            <h3>Пример 4: Урна с шарами (интерактивно)</h3>
+            <p>Измените количество красных и синих шаров в урне.</p>
+            <label>Красных шаров: <input type="number" id="redBalls" value="5" min="0" /></label>
+            <label>Синих шаров: <input type="number" id="blueBalls" value="3" min="0" /></label>
+            <canvas id="ballsChart" width="400" height="200"></canvas>
+        </section>
+
+        <section>
+            <h3>Калькулятор вероятности</h3>
+            <p>Введите количество благоприятных исходов и общее количество исходов:</p>
+            <form id="probForm">
+                <label>
+                    Благоприятных исходов:
+                    <input type="number" id="favorable" min="0" required />
+                </label>
+                <br /><br />
+                <label>
+                    Общее количество исходов:
+                    <input type="number" id="total" min="1" required />
+                </label>
+                <br /><br />
+                <button type="submit">Рассчитать вероятность</button>
+            </form>
+            <p id="result" style="font-weight: bold;"></p>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Теория вероятностей</p>
+    </footer>
+
+    <script>
+        // Монета
+        const coinCtx = document.getElementById('coinChart').getContext('2d');
+        const coinHeadProbInput = document.getElementById('coinHeadProb');
+        const coinTailProbInput = document.getElementById('coinTailProb');
+
+        const coinData = {
+            labels: ['Орёл', 'Решка'],
+            datasets: [{
+                label: 'Вероятность',
+                data: [0.5, 0.5],
+                backgroundColor: ['#4caf50', '#2196f3']
+            }]
+        };
+
+        const coinChart = new Chart(coinCtx, {
+            type: 'bar',
+            data: coinData,
+            options: {
+                scales: { y: { beginAtZero: true, max: 1 } },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => `${ctx.label}: ${(ctx.parsed.y * 100).toFixed(2)}%`
+                        }
+                    },
+                    title: { display: true, text: 'Вероятность для монеты' },
+                    legend: { display: false }
+                }
+            }
+        });
+
+        function updateCoinChart() {
+            let head = parseFloat(coinHeadProbInput.value);
+            let tail = parseFloat(coinTailProbInput.value);
+            if (isNaN(head)) head = 0;
+            if (isNaN(tail)) tail = 0;
+
+            const sum = head + tail;
+            if (sum > 0) {
+                head /= sum;
+                tail /= sum;
+            } else {
+                head = 0;
+                tail = 0;
+            }
+
+            coinChart.data.datasets[0].data = [head, tail];
+            coinChart.update();
+        }
+
+        coinHeadProbInput.addEventListener('input', updateCoinChart);
+        coinTailProbInput.addEventListener('input', updateCoinChart);
+        updateCoinChart();
+
+        // Кубик
+        const diceCtx = document.getElementById('diceChart').getContext('2d');
+        const diceInputsDiv = document.getElementById('diceInputs');
+
+        function createDiceInputs() {
+            diceInputsDiv.innerHTML = '';
+            for (let i = 1; i <= 6; i++) {
+                const label = document.createElement('label');
+                label.style.marginRight = '10px';
+                label.innerHTML = `Грань ${i}: <input type="number" id="diceFace${i}" min="0" max="1" step="0.01" value="${(1 / 6).toFixed(2)}" style="width:60px" />`;
+                diceInputsDiv.appendChild(label);
+            }
+        }
+        createDiceInputs();
+
+        function getDiceProbabilities() {
+            const probs = [];
+            for (let i = 1; i <= 6; i++) {
+                const val = parseFloat(document.getElementById(`diceFace${i}`).value);
+                probs.push(isNaN(val) ? 0 : val);
+            }
+            return probs;
+        }
+
+        const diceChart = new Chart(diceCtx, {
+            type: 'bar',
+            data: {
+                labels: ['1', '2', '3', '4', '5', '6'],
+                datasets: [{
+                    label: 'Вероятность',
+                    data: getDiceProbabilities(),
+                    backgroundColor: '#ff9800'
+                }]
+            },
+            options: {
+                scales: { y: { beginAtZero: true, max: 1 } },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => `${ctx.label}: ${(ctx.parsed.y * 100).toFixed(2)}%`
+                        }
+                    },
+                    title: { display: true, text: 'Вероятность для кубика' },
+                    legend: { display: false }
+                }
+            }
+        });
+
+        function updateDiceChart() {
+            let probs = getDiceProbabilities();
+            const sum = probs.reduce((a, b) => a + b, 0);
+            if (sum > 0) {
+                probs = probs.map(p => p / sum);
+            } else {
+                probs = probs.map(() => 0);
+            }
+            diceChart.data.datasets[0].data = probs;
+            diceChart.update();
+        }
+
+        for (let i = 1; i <= 6; i++) {
+            document.getElementById(`diceFace${i}`).addEventListener('input', updateDiceChart);
+        }
+        updateDiceChart();
+
+        // Карты
+        const cardsCtx = document.getElementById('cardsChart').getContext('2d');
+        const aceCountInput = document.getElementById('aceCount');
+        const deckCountInput = document.getElementById('deckCount');
+
+        const cardsChart = new Chart(cardsCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Тузы', 'Другие карты'],
+                datasets: [{
+                    label: 'Вероятность',
+                    data: [4 / 52, 48 / 52],
+                    backgroundColor: ['#e91e63', '#9e9e9e']
+                }]
+            },
+            options: {
+                scales: { y: { beginAtZero: true, max: 1 } },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => `${ctx.label}: ${(ctx.parsed.y * 100).toFixed(2)}%`
+                        }
+                    },
+                    title: { display: true, text: 'Вероятность вытянуть туза' },
+                    legend: { display: false }
+                }
+            }
+        });
+
+        function updateCardsChart() {
+            let aces = parseInt(aceCountInput.value) || 0;
+            let deck = parseInt(deckCountInput.value) || 1;
+            if (deck < aces) deck = aces;
+
+            const other = deck - aces;
+            cardsChart.data.datasets[0].data = [aces / deck, other / deck];
+            cardsChart.update();
+        }
+
+        aceCountInput.addEventListener('input', updateCardsChart);
+        deckCountInput.addEventListener('input', updateCardsChart);
+        updateCardsChart();
+
+        // Урна с шарами
+        const ballsCtx = document.getElementById('ballsChart').getContext('2d');
+        const redBallsInput = document.getElementById('redBalls');
+        const blueBallsInput = document.getElementById('blueBalls');
+
+        const ballsChart = new Chart(ballsCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Красные', 'Синие'],
+                datasets: [{
+                    label: 'Вероятность',
+                    data: [],
+                    backgroundColor: ['#f44336', '#2196f3']
+                }]
+            },
+            options: {
+                scales: { y: { beginAtZero: true, max: 1 } },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => `${ctx.label}: ${(ctx.parsed.y * 100).toFixed(2)}%`
+                        }
+                    },
+                    title: { display: true, text: 'Вероятность достать шар из урны' },
+                    legend: { display: false }
+                }
+            }
+        });
+
+        function updateBallsChart() {
+            let red = parseInt(redBallsInput.value) || 0;
+            let blue = parseInt(blueBallsInput.value) || 0;
+            const total = red + blue;
+            if (total === 0) {
+                ballsChart.data.datasets[0].data = [0, 0];
+            } else {
+                ballsChart.data.datasets[0].data = [red / total, blue / total];
+            }
+            ballsChart.update();
+        }
+
+        redBallsInput.addEventListener('input', updateBallsChart);
+        blueBallsInput.addEventListener('input', updateBallsChart);
+        updateBallsChart();
+
+        // Калькулятор вероятности
+        const probForm = document.getElementById('probForm');
+        const favorableInput = document.getElementById('favorable');
+        const totalInput = document.getElementById('total');
+        const resultP = document.getElementById('result');
+
+        probForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const favorable = parseInt(favorableInput.value);
+            const total = parseInt(totalInput.value);
+
+            if (favorable < 0 || total <= 0 || favorable > total) {
+                resultP.textContent = 'Пожалуйста, введите корректные данные.';
+                return;
+            }
+
+            const prob = favorable / total;
+            resultP.textContent = `Вероятность события: ${(prob * 100).toFixed(2)}%`;
+        });
+    </script>
+</body>
+
+</html>

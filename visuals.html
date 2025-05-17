@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Визуализации — Теория вероятностей</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <header>
+        <h1>Теория вероятностей</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="concepts.html">Основные понятия</a></li>
+                <li><a href="types.html">Виды вероятности</a></li>
+                <li><a href="formulas.html">Законы и формулы</a></li>
+                <li><a href="examples.html">Примеры и задачи</a></li>
+                <li><a href="visuals.html" aria-current="page">Визуализации</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h2>Визуализации</h2>
+
+        <section>
+            <h3>График биномиального распределения</h3>
+            <p>Биномиальное распределение показывает вероятность получить определённое количество успехов в серии
+                независимых испытаний с вероятностью успеха p.</p>
+            <label>Число испытаний (n): <input type="number" id="binomialN" min="1" max="100" value="20" /></label>
+            <label>Вероятность успеха (p): <input type="number" id="binomialP" min="0" max="1" step="0.01"
+                    value="0.5" /></label>
+            <canvas id="binomialChart" width="600" height="300"></canvas>
+        </section>
+
+        <section>
+            <h3>График нормального распределения</h3>
+            <p>Нормальное распределение — это «колоколообразная» кривая, описывающая множество явлений в природе и
+                технике, с параметрами среднего и разброса (стандартного отклонения).</p>
+            <label>Среднее (μ): <input type="number" id="normalMean" value="0" step="0.1" /></label>
+            <label>Стандартное отклонение (σ): <input type="number" id="normalStd" min="0.1" step="0.1"
+                    value="1" /></label>
+            <canvas id="normalChart" width="600" height="300"></canvas>
+        </section>
+
+        <section>
+            <h3>Симуляция подбрасывания монеты</h3>
+            <p>Гистограмма показывает количество выпадений орлов и решек за время симуляции. Чем больше подбрасываний,
+                тем ближе к 50% вероятность для каждого исхода.</p>
+            <button id="flipBtn">Подбросить монету</button>
+            <button id="resetFlipBtn">Сбросить</button>
+            <p>Количество бросков: <span id="flipTotalCount">0</span></p>
+            <p>Орлов: <span id="headsCount">0</span></p>
+            <p>Решек: <span id="tailsCount">0</span></p>
+            <canvas id="flipChart" width="400" height="200"></canvas>
+        </section>
+
+
+        <section>
+            <h3>Симуляция бросков кубика</h3>
+            <p>Гистограмма показывает распределение результатов бросков кубика. При большом числе бросков частоты
+                приближаются к равномерному распределению (вероятность 1/6 для каждой грани).</p>
+            <button id="rollDiceBtn">Бросить кубик</button>
+            <button id="resetDiceBtn">Сбросить</button>
+            <p>Количество бросков: <span id="diceRollsCount">0</span></p>
+            <canvas id="diceChart" width="600" height="300"></canvas>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Теория вероятностей</p>
+    </footer>
+
+    <script>
+        // ----------- Биномиальное распределение ------------
+        function binomialProb(n, k, p) {
+            function factorial(x) {
+                return x <= 1 ? 1 : x * factorial(x - 1);
+            }
+            function comb(n, k) {
+                return factorial(n) / (factorial(k) * factorial(n - k));
+            }
+            return comb(n, k) * Math.pow(p, k) * Math.pow(1 - p, n - k);
+        }
+
+        function generateBinomialData(n, p) {
+            const data = [];
+            for (let k = 0; k <= n; k++) {
+                data.push(binomialProb(n, k, p));
+            }
+            return data;
+        }
+
+        const binomialCtx = document.getElementById('binomialChart').getContext('2d');
+        const binomialNInput = document.getElementById('binomialN');
+        const binomialPInput = document.getElementById('binomialP');
+
+        let binomialChart = new Chart(binomialCtx, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Вероятность',
+                    data: [],
+                    backgroundColor: '#3f51b5'
+                }]
+            },
+            options: {
+                scales: { y: { beginAtZero: true, max: 1 } },
+                plugins: {
+                    title: { display: true, text: 'Биномиальное распределение' },
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => `k=${ctx.label}: ${(ctx.parsed.y * 100).toFixed(2)}%`
+                        }
+                    }
+                }
+            }
+        });
+
+        function updateBinomialChart() {
+            const n = parseInt(binomialNInput.value) || 20;
+            let p = parseFloat(binomialPInput.value);
+            if (p < 0) p = 0;
+            if (p > 1) p = 1;
+
+            binomialChart.data.labels = Array.from({ length: n + 1 }, (_, i) => i);
+            binomialChart.data.datasets[0].data = generateBinomialData(n, p);
+            binomialChart.update();
+        }
+
+        binomialNInput.addEventListener('input', updateBinomialChart);
+        binomialPInput.addEventListener('input', updateBinomialChart);
+        updateBinomialChart();
+
+
+        // ----------- Нормальное распределение ------------
+        function normalPDF(x, mean, std) {
+            return (1 / (std * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * Math.pow((x - mean) / std, 2));
+        }
+
+        function generateNormalData(mean, std) {
+            const data = [];
+            const labels = [];
+            const step = 0.2;
+            for (let x = mean - 4 * std; x <= mean + 4 * std; x += step) {
+                labels.push(x.toFixed(1));
+                data.push(normalPDF(x, mean, std));
+            }
+            return { labels, data };
+        }
+
+        const normalCtx = document.getElementById('normalChart').getContext('2d');
+        const normalMeanInput = document.getElementById('normalMean');
+        const normalStdInput = document.getElementById('normalStd');
+
+        let normalChart = new Chart(normalCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Плотность вероятности',
+                    data: [],
+                    borderColor: '#ff5722',
+                    fill: false,
+                    tension: 0.2
+                }]
+            },
+            options: {
+                scales: { y: { beginAtZero: true } },
+                plugins: {
+                    title: { display: true, text: 'Нормальное распределение' },
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => `y=${ctx.parsed.y.toFixed(4)}`
+                        }
+                    }
+                }
+            }
+        });
+
+        function updateNormalChart() {
+            const mean = parseFloat(normalMeanInput.value) || 0;
+            const std = parseFloat(normalStdInput.value);
+            if (!std || std <= 0) return;
+
+            const { labels, data } = generateNormalData(mean, std);
+            normalChart.data.labels = labels;
+            normalChart.data.datasets[0].data = data;
+            normalChart.update();
+        }
+
+        normalMeanInput.addEventListener('input', updateNormalChart);
+        normalStdInput.addEventListener('input', updateNormalChart);
+        updateNormalChart();
+
+
+        // ----------- Симуляция подбрасывания монеты ------------
+        const flipBtn = document.getElementById('flipBtn');
+        const resetFlipBtn = document.getElementById('resetFlipBtn');
+        const headsCountSpan = document.getElementById('headsCount');
+        const tailsCountSpan = document.getElementById('tailsCount');
+        const flipCtx = document.getElementById('flipChart').getContext('2d');
+
+        let headsCount = 0;
+        let tailsCount = 0;
+
+        const flipChart = new Chart(flipCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Орёл', 'Решка'],
+                datasets: [{
+                    label: 'Количество выпадений',
+                    data: [0, 0],
+                    backgroundColor: ['#4caf50', '#2196f3']
+                }]
+            },
+            options: {
+                scales: { y: { beginAtZero: true, stepSize: 1 } },
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: 'Результаты подбрасывания монеты' }
+                }
+            }
+        });
+
+        const flipTotalCountSpan = document.getElementById('flipTotalCount');
+
+        let flipTotalCount = 0;
+
+        flipBtn.addEventListener('click', () => {
+            const flip = Math.random() < 0.5 ? 'heads' : 'tails';
+            flipTotalCount++;
+            flipTotalCountSpan.textContent = flipTotalCount;
+
+            if (flip === 'heads') {
+                headsCount++;
+                headsCountSpan.textContent = headsCount;
+            } else {
+                tailsCount++;
+                tailsCountSpan.textContent = tailsCount;
+            }
+            flipChart.data.datasets[0].data = [headsCount, tailsCount];
+            flipChart.update();
+        });
+
+        resetFlipBtn.addEventListener('click', () => {
+            flipTotalCount = 0;
+            flipTotalCountSpan.textContent = 0;
+
+            headsCount = 0;
+            tailsCount = 0;
+            headsCountSpan.textContent = 0;
+            tailsCountSpan.textContent = 0;
+            flipChart.data.datasets[0].data = [0, 0];
+            flipChart.update();
+        });
+
+
+
+        // ----------- Симуляция бросков кубика ------------
+        const rollDiceBtn = document.getElementById('rollDiceBtn');
+        const resetDiceBtn = document.getElementById('resetDiceBtn');
+        const diceRollsCountSpan = document.getElementById('diceRollsCount');
+        const diceCtx = document.getElementById('diceChart').getContext('2d');
+
+        let diceRollsCount = 0;
+        const diceCounts = [0, 0, 0, 0, 0, 0]; // для граней 1-6
+
+        const diceChart = new Chart(diceCtx, {
+            type: 'bar',
+            data: {
+                labels: ['1', '2', '3', '4', '5', '6'],
+                datasets: [{
+                    label: 'Количество выпадений',
+                    data: diceCounts,
+                    backgroundColor: '#9c27b0'
+                }]
+            },
+            options: {
+                scales: { y: { beginAtZero: true, stepSize: 1 } },
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: 'Распределение результатов бросков кубика' }
+                }
+            }
+        });
+
+        rollDiceBtn.addEventListener('click', () => {
+            const roll = Math.floor(Math.random() * 6);
+            diceCounts[roll]++;
+            diceRollsCount++;
+            diceRollsCountSpan.textContent = diceRollsCount;
+            diceChart.update();
+        });
+
+        resetDiceBtn.addEventListener('click', () => {
+            for (let i = 0; i < diceCounts.length; i++) diceCounts[i] = 0;
+            diceRollsCount = 0;
+            diceRollsCountSpan.textContent = 0;
+            diceChart.update();
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Законы и формулы — Теория вероятностей</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <header>
+        <h1>Теория вероятностей</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="concepts.html">Основные понятия</a></li>
+                <li><a href="types.html">Виды вероятности</a></li>
+                <li><a href="formulas.html" class="active">Законы и формулы</a></li>
+                <li><a href="examples.html">Примеры и задачи</a></li>
+                <li><a href="visuals.html">Визуализации</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h2>Законы и формулы</h2>
+
+        <section>
+            <h3>Сложение вероятностей</h3>
+            <p>
+                Для двух событий A и B вероятность их объединения (событие "A или B") равна:
+            </p>
+            <pre><code>P(A ∪ B) = P(A) + P(B) − P(A ∩ B)</code></pre>
+            <p>
+                Если события несовместны (не могут произойти одновременно), то
+            </p>
+            <pre><code>P(A ∪ B) = P(A) + P(B)</code></pre>
+        </section>
+
+        <section>
+            <h3>Умножение вероятностей</h3>
+            <p>
+                Вероятность совместного наступления двух событий A и B:
+            </p>
+            <pre><code>P(A ∩ B) = P(A) × P(B|A) = P(B) × P(A|B)</code></pre>
+            <p>
+                Если события независимы, то:
+            </p>
+            <pre><code>P(A ∩ B) = P(A) × P(B)</code></pre>
+        </section>
+
+        <section>
+            <h3>Условная вероятность</h3>
+            <p>
+                Вероятность события A при условии, что произошло событие B:
+            </p>
+            <pre><code>P(A|B) = P(A ∩ B) / P(B), при P(B) > 0</code></pre>
+        </section>
+
+        <section>
+            <h3>Формула Байеса</h3>
+            <p>
+                Позволяет пересчитать вероятность события A с учётом информации о событии B:
+            </p>
+            <pre><code>P(A|B) = (P(B|A) × P(A)) / P(B)</code></pre>
+        </section>
+
+        <section>
+            <h3>Независимость событий</h3>
+            <p>
+                События A и B независимы, если выполнение одного не влияет на вероятность другого:
+            </p>
+            <pre><code>P(A ∩ B) = P(A) × P(B)</code></pre>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Теория вероятностей</p>
+    </footer>
+</body>
+
+</html>

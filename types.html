@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Виды вероятности — Теория вероятностей</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <header>
+        <h1>Теория вероятностей</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="concepts.html">Основные понятия</a></li>
+                <li><a href="types.html" class="active">Виды вероятности</a></li>
+                <li><a href="formulas.html">Законы и формулы</a></li>
+                <li><a href="examples.html">Примеры и задачи</a></li>
+                <li><a href="visuals.html">Визуализации</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h2>Виды вероятности</h2>
+
+        <section>
+            <h3>Классическая вероятность</h3>
+            <p>
+                Применяется, когда все исходы равновозможны. Вычисляется по формуле
+                <code>P(A) = n / N</code>, где <em>n</em> — число благоприятных исходов,
+                а <em>N</em> — общее число исходов.
+            </p>
+            <div class="chart-container">
+                <canvas id="classicalChart"></canvas>
+            </div>
+        </section>
+
+        <section>
+            <h3>Статистическая вероятность</h3>
+            <p>
+                Основана на опыте. Вычисляется как отношение числа наступлений события к
+                общему количеству экспериментов: <code>P(A) ≈ m / n</code>.
+            </p>
+            <div class="chart-container">
+                <canvas id="statisticalChart"></canvas>
+            </div>
+        </section>
+
+        <section>
+            <h3>Геометрическая вероятность</h3>
+            <p>
+                Используется для непрерывных пространств. Вычисляется как отношение длины,
+                площади или объёма благоприятной области к общей длине, площади или объёму.
+            </p>
+            <div class="chart-container">
+                <canvas id="geometricChart"></canvas>
+            </div>
+        </section>
+
+        <section>
+            <h3>Условная вероятность</h3>
+            <p>
+                Это вероятность события A при условии, что событие B уже произошло.
+                Обозначается как <code>P(A|B)</code> и вычисляется по формуле:
+            </p>
+            <pre><code>P(A|B) = P(A ∩ B) / P(B)</code></pre>
+            <div class="chart-container">
+                <canvas id="conditionalChart"></canvas>
+            </div>
+        </section>
+
+        <section>
+            <h3>Байесовская вероятность</h3>
+            <p>
+                Использует формулу Байеса для пересмотра вероятностей после получения новой
+                информации:
+            </p>
+            <pre><code>P(A|B) = (P(B|A) × P(A)) / P(B)</code></pre>
+            <p>Применяется, например, в машинном обучении, медицине, анализе данных.</p>
+            <div class="chart-container">
+                <canvas id="bayesChart"></canvas>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Теория вероятностей</p>
+    </footer>
+
+    <script>
+        // Классическая вероятность: равновероятные исходы кубика 1–6
+        const classicalCtx = document.getElementById('classicalChart').getContext('2d');
+        const classicalChart = new Chart(classicalCtx, {
+            type: 'bar',
+            data: {
+                labels: ['1', '2', '3', '4', '5', '6'],
+                datasets: [{
+                    label: 'Вероятность',
+                    data: [1 / 6, 1 / 6, 1 / 6, 1 / 6, 1 / 6, 1 / 6],
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: { beginAtZero: true, max: 0.2 },
+                },
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: 'Классическая вероятность — кубик' }
+                }
+            }
+        });
+
+        // Статистическая вероятность: пример эксперимента (10 бросков, 7 успехов)
+        const statisticalCtx = document.getElementById('statisticalChart').getContext('2d');
+        const statisticalChart = new Chart(statisticalCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Успех', 'Неудача'],
+                datasets: [{
+                    label: 'Относительная частота',
+                    data: [7 / 10, 3 / 10],
+                    backgroundColor: ['rgba(75, 192, 192, 0.7)', 'rgba(255, 99, 132, 0.7)'],
+                    borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: { beginAtZero: true, max: 1 },
+                },
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: 'Статистическая вероятность (пример)' }
+                }
+            }
+        });
+
+        // Геометрическая вероятность: линия длиной 1, благоприятный интервал [0,0.3]
+        const geometricCtx = document.getElementById('geometricChart').getContext('2d');
+        const geometricChart = new Chart(geometricCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Благоприятный интервал', 'Остальное'],
+                datasets: [{
+                    label: 'Доля длины',
+                    data: [0.3, 0.7],
+                    backgroundColor: ['rgba(153, 102, 255, 0.7)', 'rgba(201, 203, 207, 0.7)'],
+                    borderColor: ['rgba(153, 102, 255, 1)', 'rgba(201, 203, 207, 1)'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                scales: {
+                    x: { beginAtZero: true, max: 1 }
+                },
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: 'Геометрическая вероятность' }
+                }
+            }
+        });
+
+        // Условная вероятность: P(A ∩ B) = 0.2, P(B) = 0.5 => P(A|B) = 0.4
+        // Визуализируем двумя столбцами: P(B) и P(A|B)
+        const conditionalCtx = document.getElementById('conditionalChart').getContext('2d');
+        const conditionalChart = new Chart(conditionalCtx, {
+            type: 'bar',
+            data: {
+                labels: ['P(B)', 'P(A|B)'],
+                datasets: [{
+                    label: 'Вероятность',
+                    data: [0.5, 0.4],
+                    backgroundColor: ['rgba(255, 206, 86, 0.7)', 'rgba(255, 159, 64, 0.7)'],
+                    borderColor: ['rgba(255, 206, 86, 1)', 'rgba(255, 159, 64, 1)'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: { beginAtZero: true, max: 1 }
+                },
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: 'Условная вероятность' }
+                }
+            }
+        });
+
+        // Байесовская вероятность: пример апдейта вероятности
+        // P(A)=0.1, P(B|A)=0.8, P(B)=0.3
+        // P(A|B) = (0.8*0.1)/0.3 = 0.267
+        const bayesCtx = document.getElementById('bayesChart').getContext('2d');
+        const bayesChart = new Chart(bayesCtx, {
+            type: 'bar',
+            data: {
+                labels: ['P(A)', 'P(B|A)', 'P(B)', 'P(A|B)'],
+                datasets: [{
+                    label: 'Вероятность',
+                    data: [0.1, 0.8, 0.3, 0.267],
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(153, 102, 255, 0.7)',
+                        'rgba(255, 206, 86, 0.7)',
+                        'rgba(75, 192, 192, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: { beginAtZero: true, max: 1 }
+                },
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: 'Байесовская вероятность' }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
